@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.Promise =  global.Promise;
+mongoose.Promise = global.Promise;
 const slug = require('slugs');
 
 const storeSchema = new mongoose.Schema({
@@ -16,7 +16,7 @@ const storeSchema = new mongoose.Schema({
   tags: [String]
 });
 
-storeSchema.pre('save', function() {
+storeSchema.pre('save', function(next) {
   if(!this.isModified('name')){
     next();
     return;
