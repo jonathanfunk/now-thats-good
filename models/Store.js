@@ -40,6 +40,12 @@ const storeSchema = new mongoose.Schema({
   }
 });
 
+// This allows the search field to search these fields in one shot
+storeSchema.index({
+  name: 'text',
+  description: 'text'
+});
+
 storeSchema.pre('save', async function(next) {
   if(!this.isModified('name')){
     next();
