@@ -70,15 +70,56 @@ storeSchema.pre('save', async function(next) {
     this.slug = `${this.slug}-${storesWithSlug.length + 1}`;
   }
   next();
-  // TODO make more resilient
 })
 
 storeSchema.statics.getTagsList = function() {
-  return this.aggregate([
+  return this.aggregate([ //aggregate is like find except for more complicated stuff
     { $unwind: '$tags' },
     { $group: { _id: '$tags', count: { $sum: 1 } }},
     { $sort:  { count: -1 }}
   ])
 }
+
+storeSchema.statics.getTopStores = function() {
+  return this.aggregate([
+    //Look up stores & populate their reviews
+    { 
+      $lookup: { 
+        from: 'reviews', 
+        localField: '_id', 
+        foreignField: 'store', 
+        as: 'reviews'
+      } 
+    },
+    //Filter for only items that have two or more reviews
+    {
+      $match: {
+        'reviews.1': { $exists: true }
+      }
+    },
+    //Add the average reviews field
+    {
+      $project: {
+        photo: '$$ROOT.photo',
+        name: '$$ROOT.name',
+        reviews: '$$ROOT.reviews',
+        slug: '$$ROOT.slug',
+        averageRating: { $avg: '$reviews.rating'}
+      }
+    },
+    //Sort it by our new field, highest reviews first
+    { $sort: { averageRating: -1 }},
+    //Limit to at most 10
+    { $limit: 10 }
+  ])
+}
+
+function autopopulate(next) {
+  this.populate('reviews');
+  next();
+}
+
+storeSchema.pre('find', autopopulate);
+storeSchema.pre('findOne', autopopulate)
 
 module.exports = mongoose.model('Store', storeSchema);

@@ -48,7 +48,7 @@ exports.createStore = async (req, res) => {
 }
 
 exports.getStores = async (req, res) => {
-  const stores = await (Store.find());
+  const stores = await Store.find().populate('reviews');
   res.render('stores', { title: 'Stores', stores })
 }
 
@@ -74,7 +74,7 @@ exports.updateStore = async (req, res) => {
   res.redirect(`/stores/${store._id}/edit`);
 }
 
-exports.getStoreBySlug = async (req, res) => {
+exports.getStoreBySlug = async (req, res, next) => {
   const store = await Store.findOne({ slug: req.params.slug }).populate('author, reviews');
   if(!store) return next(); //If there is no store slug, it will forward error handler in app.js
   res.render('store',{store, title: store.name});
@@ -140,4 +140,9 @@ exports.getHearts = async (req, res) => {
     _id: { $in: req.user.hearts }
   });
   res.render('stores', { title: 'Hearted Stores', stores})
+}
+
+exports.getTopStores = async (req, res) => {
+  const stores = await Store.getTopStores();
+  res.render('topStores', { stores, title: 'Top Stores' });
 }
