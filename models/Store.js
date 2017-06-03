@@ -38,12 +38,22 @@ const storeSchema = new mongoose.Schema({
     ref: 'User', //refers to User from User.js
     required: 'You must supply an author'
   }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
 });
 
-// This allows the search field to search these fields in one shot
+//This allows the search field to search these fields in one shot
 storeSchema.index({
   name: 'text',
   description: 'text'
+});
+
+//This finds reviews where the stores _id property === reviews store property
+storeSchema.virtual('reviews', {
+  ref: 'Review', //What model to link?
+  localField: '_id', //Which field on the store?
+  foreignField: 'store' //Which field on the review?
 });
 
 storeSchema.index({ location: '2dsphere'});
