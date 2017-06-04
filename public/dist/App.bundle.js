@@ -998,7 +998,7 @@ var _bling = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//This funtionality will update the user interface
+// This funtionality will update the user interface
 function ajaxHeart(e) {
   var _this = this;
 

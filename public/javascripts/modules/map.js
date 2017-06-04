@@ -4,14 +4,14 @@ import { $ } from './bling';
 const mapOptions = {
   center: { lat: 49.29, lng: -123.12 },
   zoom: 12
-}
+};
 
 function loadPlaces(map, lat = 49.28, lng = -123.12) {
   axios.get(`/api/stores/near?lat=${lat}&lng=${lng}`)
     .then(res => {
       const places = res.data;
       if (!places.length) {
-        alert('No places found!')
+        alert('No places found!');
         return;
       }
       const bounds = new google.maps.LatLngBounds();
@@ -24,9 +24,9 @@ function loadPlaces(map, lat = 49.28, lng = -123.12) {
         const marker = new google.maps.Marker({ map, position });
         marker.place = place;
         return marker;
-      })
+      });
 
-      markers.forEach(marker => marker.addListener('click', function() {
+      markers.forEach(marker => marker.addListener('click', function () {
         const html = `
           <div class="popup">
             <a href="/store/${this.place.slug}">
@@ -40,12 +40,11 @@ function loadPlaces(map, lat = 49.28, lng = -123.12) {
       }));
       map.setCenter(bounds.getCenter());
       map.fitBounds(bounds);
-    })
-
+    });
 }
 
 function makeMap(mapDiv) {
-  if(!mapDiv) return;
+  if (!mapDiv) return;
   const map = new google.maps.Map(mapDiv, mapOptions);
   loadPlaces(map);
   const input = $('[name="geolocate"]');
@@ -53,7 +52,7 @@ function makeMap(mapDiv) {
   autocomplete.addListener('place_changed', () => {
     const place = autocomplete.getPlace();
     loadPlaces(map, place.geometry.location.lat(), place.geometry.location.lng());
-  })
+  });
 }
 
-export default makeMap
+export default makeMap;
